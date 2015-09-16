@@ -4,61 +4,69 @@
     <meta charset="utf-8" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
-    <!-- <link rel="stylesheet" href="css/jquery.mobile.custom.structure.css" />
-    <link rel="stylesheet" href="css/jquery.mobile.custom.theme.css" />
-    <script src="js/jquery.mobile.custom.js"></script> -->
     <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
     <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
     <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    
     <script src="js/data.js"></script>
-    <!-- <link rel="stylesheet" type="text/css" href="css/index.css" /> -->
+    
     <script type="text/javascript">
+
         function onError(e){
             alert("Code d'erreur BD : " + e.code);
         }
     
-        //Test for browser compatibility
+        // Teste si le navigateur supporte le WebSQL
         if (window.openDatabase) {
             //Create the database the parameters are 1. the database name 2.version number 3. a description 4. the size of the database (in bytes) 1024 x 1024 = 1MB
-            var mydb = openDatabase("recette_db_v7", "0.1", "A Database of recette", 2*1024 * 1024);
+            var mydb = openDatabase("recette_db_v7", "0.1", "A Database of recette", 2 * 1024 * 1024);
 
-            //create the cars table using SQL for the database using a transaction
+            // Crée les tables pour les recette, et les ingrédients
             mydb.transaction(function (t) {
-                // t.executeSql("CREATE TABLE IF NOT EXISTS rec_recette (id INTEGER PRIMARY KEY ASC, recette TEXT)");
                 t.executeSql("CREATE TABLE rec_recette (id INTEGER PRIMARY KEY, rec_nom TEXT)");
                 t.executeSql("CREATE TABLE recette_ingredient (id_recette INTEGER, id_ingredient INTEGER,  PRIMARY KEY ('id_recette','id_ingredient'))");
                 t.executeSql("CREATE TABLE ing_ingredient (id INTEGER PRIMARY KEY, ing_nom TEXT)");
+
             });
+
             ChargerBD();
 
         } else {
             alert("WebSQL is not supported by your browser!");
+
         }
 
         function ChargerBD() {
-
+            // Charge le fichier data.js dans la BD WebSQL
             mydb.transaction(function (t) {
                 for (var i = table_recette.length - 1; i >= 0; i--) {
                     t.executeSql("INSERT INTO rec_recette VALUES (?,?)", [table_recette[i].id, table_recette[i].nom]);
+
                 };
+
             });
 
             mydb.transaction(function (t) {
                 for (var i = table_recette_ing.length - 1; i >= 0; i--) {
                     t.executeSql("INSERT INTO recette_ingredient VALUES (?,?)", [table_recette_ing[i].id_recette, table_recette_ing[i].id_ingredient]);
+
                 };
+
             });
 
              mydb.transaction(function (t) {
                 for (var i = table_ingredient.length - 1; i >= 0; i--) {
                     t.executeSql("INSERT INTO ing_ingredient VALUES (?,?)", [table_ingredient[i].id_ing, table_ingredient[i].nom]);
+
                 };
+
             });
 
         }
 
         $(document).on("pagecreate","#pageListeRecette",function(){
             AfficherRecette();
+
         });
 
 
@@ -74,13 +82,21 @@
                     mydb.transaction(function (t) {
                         t.executeSql("INSERT INTO rec_recette (rec_nom) VALUES (?)", [recette]);
                         AfficherRecette();
+
                     });
-                } else {
-                    alert("You must enter a make and model!");
+
                 }
+                else
+                {
+                    alert("You must enter a make and model!");
+
+                }
+
             } else {
                 alert("db not found, your browser does not support web sql!");
+
             }
+
         }
 
         function AfficherRecette() {
@@ -89,20 +105,20 @@
                 //Get all the cars from the database with a select statement, set outputCarList as the callback function for the executeSql command
                 mydb.transaction(function (t) {
                     t.executeSql("SELECT * FROM rec_recette", [], ActualiseListe);
+
                 });
-            } else {
+
+            }
+            else
+            {
                 alert("db not found, your browser does not support web sql!");
+
             }
         }
 
         function ActualiseListe(transaction, results) {
-            //initialise the listitems variable
-            //var listitems = "";
-            //get the car list holder ul
-            //var listholder = document.getElementById("contentPageListe");
-
-            //clear cars list ul
-            //listholder.innerHTML = '<form><fieldset data-role="controlgroup">';
+            
+            // Crée la liste de checkbox de recettes
             $("#contentPageListe").append('<form><fieldset id="cbFieldSet" data-role="controlgroup">');
 
             var i;
@@ -112,46 +128,17 @@
                 var row = results.rows.item(i);
                 var idCbxRecette = '"cbxRecette' + row.id + '"';
                 $("#cbFieldSet").append('<input type="checkbox" name=' + idCbxRecette + 'id=' + idCbxRecette + 'value=' + row.id + '><label for=' + idCbxRecette + '>' + row.rec_nom + '</label>');
+
             }
-            //listholder.innerHTML += '</fieldset></form>';
+            
             $("#contentPageListe").trigger("create")
-
-            /*$("#listeRecette").on("click", ".itemRecette", function (e) {
-                    e.preventDefault();
-                    //store the information in the next page's data
-                    $("#pageRecette").data("id_recette", this.id);
-                    //change the page # to second page. 
-                    //Now the URL in the address bar will read index.html#details-page
-                    //where #details-page is the "id" of the second page
-                    //we're gonna redirect to that now using changePage() method
-                    $.mobile.changePage("#pageRecette");
-            });*/
-
-            //$( "#listeRecette" ).listview( "refresh" );
 
         }
 
         $(document).on("pagebeforeshow", "#pageRecette", function () {
             //get from data - you put this here when the "a" wa clicked in the previous page
             var info = $(this).data("ids_recette");
-            
-            //string to put HTML in
-            //var info_view = "";
-            //use for..in to iterate through object
-            /*for (var key in info) {
-                //Im using grid layout here.
-                //use any kind of layout you want.
-                //key is the key of the property in the object 
-                //if obj = {name: 'k'}
-                //key = name, value = k
-                info_view += '<div class="ui-grid-a"><div class="ui-block-a"><div class="ui-bar field" style="font-weight : bold; text-align: left;">' + key + '</div></div><div class="ui-block-b"><div class="ui-bar value" style="width : 75%">' + info[key] + '</div></div></div>';
-            }*/
 
-            //var info_view = '<li>Brocoli</li><li>Fromage</li><li>Steak Haché</li>';
-            //var listIngredientholder = document.getElementById("listeIngredientsRecette");
-            //$("#listeIngredientsRecette").append('<form><fieldset id="cbFieldSet" data-role="controlgroup">');
-            //clear cars list ul
-            //listIngredientholder.innerHTML = "";
             $("#listeIngredientsRecette").empty();
             mydb.transaction(function (t) {
                     t.executeSql("SELECT * FROM ing_ingredient i, recette_ingredient r WHERE r.id_ingredient = i.id AND r.id_recette in (" + info + ")", [], function (t, data) {
@@ -162,10 +149,9 @@
                         }
                     }, onError);
                 });
-            //add this to html
-            //document.getElementById("listeIngredientsRecette").innerHTML = info_view;
-            //$("#listeIngredientsRecette").trigger("create")
+
             $('#listeIngredientsRecette').listview('refresh');
+
         });
 
         function showSelectedNames(){
@@ -184,48 +170,39 @@
 </head>
 
 <body>
-<div data-role="page" id="pageListeRecette">
-
-    <div data-role="header">
-        <h1>Maxi Épicerie</h1>
-    </div><!-- /header -->
-    <!-- <div id="controls">
-        <form>
-            <input type="text" id="tbxRecette" />
-        <button class="ui-btn" id="AjouterRecette" onclick="AjouterRecette();">+</button>
-    </div> -->
-    <div role="main" class="ui-content" id="contentPageListe">
-        <!-- <ul id="listeRecette" data-role="listview" data-filter="true">
-        </ul>   -->
-         
-    </div>
-    <a class="ui-btn ui-corner-all" href="#pageRecette" onclick="showSelectedNames()">Lister les ingrédients</a>
-    <!-- /content -->
-    <div data-role="footer">
-        <div id="deviceready" class="blink">
-            <p class="event listening">Connecting to Device</p>
-            <p class="event received">Device is Ready</p>
+    <div data-role="page" id="pageListeRecette">
+    <!-- Page principale de listes de recette -->
+        <div data-role="header">
+            <h1>Maxi Épicerie</h1>
+        </div><!-- /header -->
+        <div role="main" class="ui-content" id="contentPageListe">
         </div>
-    </div><!-- /footer -->
-</div><!-- /page -->
+        <a class="ui-btn ui-corner-all" href="#pageRecette" onclick="showSelectedNames()">Lister les ingrédients</a>
+        <!-- /content -->
+        <div data-role="footer">
+            <div id="deviceready" class="blink">
+                <p class="event listening">Connecting to Device</p>
+                <p class="event received">Device is Ready</p>
+            </div>
+        </div><!-- /footer -->
+    </div><!-- /page -->
 
-<div data-role="page" id="pageRecette">
+    <div data-role="page" id="pageRecette">
+    <!-- Page qui liste les ingrédients -->
+        <div data-role="header">
+            <h1>Ingrédients</h1>
+        </div><!-- /header -->
 
-    <div data-role="header">
-        <h1>Ingrédients</h1>
-    </div><!-- /header -->
+        <div role="main" class="ui-content">
+                <ul id="listeIngredientsRecette" data-role="listview">
 
-    <div role="main" class="ui-content">
-            <ul id="listeIngredientsRecette" data-role="listview">
+                </ul>
+        </div><!-- /content -->
 
-            </ul>
-    </div><!-- /content -->
+    </div><!-- /page -->
 
-</div><!-- /page -->
-<script type="text/javascript" src="cordova.js"></script>
-        <script type="text/javascript" src="js/index.js"></script>
-        <script type="text/javascript">
-            app.initialize();
-        </script>
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript">app.initialize();</script>
 </body>
 </html>
