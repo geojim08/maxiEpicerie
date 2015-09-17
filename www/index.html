@@ -69,7 +69,6 @@
 
         });
 
-
         function AjouterRecette() {
         //check to ensure the mydb object has been created
             if (mydb) {
@@ -135,22 +134,31 @@
 
         }
 
-        $(document).on("pagebeforeshow", "#pageRecette", function () {
+        $(document).on("pagebeforeshow", "#pageIngredients", function (event) {
             //get from data - you put this here when the "a" wa clicked in the previous page
             var info = $(this).data("ids_recette");
 
-            $("#listeIngredientsRecette").empty();
+            //$("#listeIngredientsRecette").empty();
+            $("#contentListeIngredients").empty();
+            // Crée la liste de checkbox de recettes
+            $("#contentListeIngredients").append('<form><fieldset id="cbFieldSIng" data-role="controlgroup">');
+
+            
             mydb.transaction(function (t) {
                     t.executeSql("SELECT * FROM ing_ingredient i, recette_ingredient r WHERE r.id_ingredient = i.id AND r.id_recette in (" + info + ")", [], function (t, data) {
                         for(var i = 0; i < data.rows.length; i++){ 
                             //alert(row.ing_nom);
                             var row = data.rows.item(i);
-                            $("#listeIngredientsRecette").append('<li><a href="#">' + row.ing_nom + "</a></li>");
+                            //$("#listeIngredientsRecette").append('<li><a href="#">' + row.ing_nom + "</a></li>");
+                            var idCbxIngredient = '"cbxIngredient' + row.id + '"';
+                            $("#contentListeIngredients").append('<input type="checkbox" name=' + idCbxIngredient + 'id=' + idCbxIngredient + 'value=' + row.id + '><label for=' + idCbxIngredient + '>' + row.ing_nom + '</label>');
+
                         }
                     }, onError);
                 });
 
-            $('#listeIngredientsRecette').listview('refresh');
+            //$('#listeIngredientsRecette').listview('refresh');
+            $("#contentListeIngredients").trigger("create")
 
         });
 
@@ -161,7 +169,7 @@
                 str += $("#cbFieldSet input:checked")[i].value + ',';
             }
             str = str.substring(0, str.length - 1);
-            $("#pageRecette").data("ids_recette", str);
+            $("#pageIngredients").data("ids_recette", str);
 
         }
 
@@ -177,7 +185,7 @@
         </div><!-- /header -->
         <div role="main" class="ui-content" id="contentPageListe">
         </div>
-        <a class="ui-btn ui-corner-all" href="#pageRecette" onclick="showSelectedNames()">Lister les ingrédients</a>
+        <a class="ui-btn ui-corner-all" href="#pageIngredients" onclick="showSelectedNames()">Lister les ingrédients</a>
         <!-- /content -->
         <div data-role="footer">
             <div id="deviceready" class="blink">
@@ -187,16 +195,14 @@
         </div><!-- /footer -->
     </div><!-- /page -->
 
-    <div data-role="page" id="pageRecette">
+    <div data-role="page" id="pageIngredients">
     <!-- Page qui liste les ingrédients -->
         <div data-role="header">
             <h1>Ingrédients</h1>
         </div><!-- /header -->
 
-        <div role="main" class="ui-content">
-                <ul id="listeIngredientsRecette" data-role="listview">
+        <div role="main" class="ui-content" id="contentListeIngredients">
 
-                </ul>
         </div><!-- /content -->
 
     </div><!-- /page -->
