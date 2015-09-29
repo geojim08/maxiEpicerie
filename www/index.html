@@ -139,39 +139,87 @@
             var info = $(this).data("ids_recette");
 
             //$("#listeIngredientsRecette").empty();
-            $("#contentListeIngredients").empty();
+            $("#cbFieldIng").empty();
             // Crée la liste de checkbox de recettes
-            $("#contentListeIngredients").append('<form><fieldset id="cbFieldSIng" data-role="controlgroup">');
+            //$("#contentListeIngredients").append('<form><fieldset id="cbFieldIng" data-role="controlgroup">');
 
-            
             mydb.transaction(function (t) {
                     t.executeSql("SELECT * FROM ing_ingredient i, recette_ingredient r WHERE r.id_ingredient = i.id AND r.id_recette in (" + info + ")", [], function (t, data) {
                         for(var i = 0; i < data.rows.length; i++){ 
-                            //alert(row.ing_nom);
                             var row = data.rows.item(i);
                             //$("#listeIngredientsRecette").append('<li><a href="#">' + row.ing_nom + "</a></li>");
                             var idCbxIngredient = '"cbxIngredient' + row.id + '"';
-                            $("#contentListeIngredients").append('<input type="checkbox" name=' + idCbxIngredient + 'id=' + idCbxIngredient + 'value=' + row.id + '><label for=' + idCbxIngredient + '>' + row.ing_nom + '</label>');
+                            $("#cbFieldIng").append('<input type="checkbox" name=' + idCbxIngredient + 'id=' + idCbxIngredient + 'value=' + row.id + '><label for=' + idCbxIngredient + '>' + row.ing_nom + '</label>');
+
+                        }
+                    }, onError);
+                });
+            //$("#contentListeIngredients").append('</fieldset></form>');
+
+            //$('#listeIngredientsRecette').listview('refresh');
+            $("#cbFieldIng").enhanceWithin();
+
+        });
+
+        function showSelectedNames(pFieldSet){
+            
+            var optionFieldSet = '';
+
+            if (pFieldSet == "#cbFieldSet") 
+            {
+                optionFieldSet = " input:checked";
+            }
+            else if (pFieldSet == "#cbFieldIng")
+            {
+                optionFieldSet = " input:not(:checked)";
+            }
+
+            var count = $(pFieldSet + optionFieldSet).length;
+            var str = '';
+
+
+            for(i=0;i<count;i++){
+                str += $(pFieldSet + optionFieldSet)[i].value + ',';
+            }
+            str = str.substring(0, str.length - 1);
+
+            if (pFieldSet == "#cbFieldSet") 
+            {
+                $("#pageIngredients").data("ids_recette", str);
+                $.mobile.pageContainer.pagecontainer("change", "#pageIngredients");
+            }
+            else if (pFieldSet == "#cbFieldIng")
+            {
+                $("#pageListeEpicerie").data("ids_ingredient", str);
+                $.mobile.pageContainer.pagecontainer("change", "#pageListeEpicerie");
+
+            };
+            
+        }
+
+        $(document).on("pagebeforeshow", "#pageListeEpicerie", function (event) {
+            //get from data - you put this here when the "a" wa clicked in the previous page
+            var info = $(this).data("ids_ingredient");
+
+            //$("#listeIngredientsRecette").empty();
+            $("#contentListeEpicerie").empty();
+            // Crée la liste de checkbox de recettes
+            $("#contentListeEpicerie").append('<form><fieldset id="cbFieldIngEpicerie" data-role="controlgroup">');
+
+            mydb.transaction(function (t) {
+                    t.executeSql("SELECT * FROM ing_ingredient WHERE id in (" + info + ")", [], function (t, data) {
+                        for(var i = 0; i < data.rows.length; i++){ 
+                            var row = data.rows.item(i);
+                            var idCbxIngredientEpicerie = '"cbxIngredientEpicerie' + row.id + '"';
+                            $("#contentListeEpicerie").append('<input type="checkbox" name=' + idCbxIngredientEpicerie + 'id=' + idCbxIngredientEpicerie + 'value=' + row.id + '><label for=' + idCbxIngredientEpicerie + '>' + row.ing_nom + '</label>');
 
                         }
                     }, onError);
                 });
 
-            //$('#listeIngredientsRecette').listview('refresh');
-            $("#contentListeIngredients").trigger("create")
+            $("#contentListeEpicerie").enhanceWithin();
 
         });
-
-        function showSelectedNames(){
-            var count = $("#cbFieldSet input:checked").length;
-            var str = '';
-            for(i=0;i<count;i++){
-                str += $("#cbFieldSet input:checked")[i].value + ',';
-            }
-            str = str.substring(0, str.length - 1);
-            $("#pageIngredients").data("ids_recette", str);
-
-        }
 
     </script>
     <title>Page Title</title>
@@ -185,7 +233,7 @@
         </div><!-- /header -->
         <div role="main" class="ui-content" id="contentPageListe">
         </div>
-        <a class="ui-btn ui-corner-all" href="#pageIngredients" onclick="showSelectedNames()">Lister les ingrédients</a>
+        <a class="ui-btn ui-corner-all"  onclick="showSelectedNames('#cbFieldSet')">Lister les ingrédients</a>
         <!-- /content -->
         <div data-role="footer">
             <div id="deviceready" class="blink">
@@ -196,19 +244,40 @@
     </div><!-- /page -->
 
     <div data-role="page" id="pageIngredients">
-    <!-- Page qui liste les ingrédients -->
+    <!-- Page qui liste les ingrédients des recettes -->
         <div data-role="header">
             <h1>Ingrédients</h1>
         </div><!-- /header -->
 
         <div role="main" class="ui-content" id="contentListeIngredients">
-
+            <div data-role="fieldcontain">
+                <form>
+                    <fieldset id="cbFieldIng" data-role="controlgroup">
+                    </fieldset>
+                </form>
+            </div>
         </div><!-- /content -->
-
+        <div data-role="footer">
+            <a href="#" class="ui-btn" onclick="showSelectedNames('#cbFieldIng')">Aller à l'épicerie</a>
+        </div><!-- /footer -->
     </div><!-- /page -->
 
-    <script type="text/javascript" src="cordova.js"></script>
+    <div data-role="page" id="pageListeEpicerie">
+    <!-- Page qui liste les ingrédients de l'épicerie -->
+        <div data-role="header">
+            <h1>Liste d'épicerie</h1>
+        </div><!-- /header -->
+
+        <div role="main" class="ui-content" id="contentListeEpicerie">
+
+        </div><!-- /content -->
+        <div data-role="footer">
+            
+        </div><!-- /footer -->
+    </div><!-- /page -->
+
+    <!-- <script type="text/javascript" src="cordova.js"></script>
     <script type="text/javascript" src="js/index.js"></script>
-    <script type="text/javascript">app.initialize();</script>
+    <script type="text/javascript">app.initialize();</script> -->
 </body>
 </html>
