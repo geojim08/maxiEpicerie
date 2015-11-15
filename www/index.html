@@ -7,9 +7,7 @@
     <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
     <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
     <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
-    
     <script src="js/data.js"></script>
-    
     <script type="text/javascript">
 
         function onError(e){
@@ -19,12 +17,12 @@
         // Teste si le navigateur supporte le WebSQL
         if (window.openDatabase) {
             //Create the database the parameters are 1. the database name 2.version number 3. a description 4. the size of the database (in bytes) 1024 x 1024 = 1MB
-            var mydb = openDatabase("recette_db_v7", "0.1", "A Database of recette", 2 * 1024 * 1024);
+            var mydb = openDatabase("recette_db_v10", "0.1", "A Database of recette", 2 * 1024 * 1024);
 
             // Crée les tables pour les recette, et les ingrédients
             mydb.transaction(function (t) {
                 t.executeSql("CREATE TABLE rec_recette (id INTEGER PRIMARY KEY, rec_nom TEXT)");
-                t.executeSql("CREATE TABLE recette_ingredient (id_recette INTEGER, id_ingredient INTEGER,  PRIMARY KEY ('id_recette','id_ingredient'))");
+                t.executeSql("CREATE TABLE recette_ingredient (id_recette INTEGER, id_ingredient INTEGER, ri_quantite TEXT, PRIMARY KEY (id_recette,id_ingredient))");
                 t.executeSql("CREATE TABLE ing_ingredient (id INTEGER PRIMARY KEY, ing_nom TEXT)");
 
             });
@@ -48,7 +46,7 @@
 
             mydb.transaction(function (t) {
                 for (var i = table_recette_ing.length - 1; i >= 0; i--) {
-                    t.executeSql("INSERT INTO recette_ingredient VALUES (?,?)", [table_recette_ing[i].id_recette, table_recette_ing[i].id_ingredient]);
+                    t.executeSql("INSERT INTO recette_ingredient VALUES (?,?,?)", [table_recette_ing[i].id_recette, table_recette_ing[i].id_ingredient, table_recette_ing[i].ri_quantite]);
 
                 };
 
@@ -144,12 +142,12 @@
             //$("#contentListeIngredients").append('<form><fieldset id="cbFieldIng" data-role="controlgroup">');
 
             mydb.transaction(function (t) {
-                    t.executeSql("SELECT * FROM ing_ingredient i, recette_ingredient r WHERE r.id_ingredient = i.id AND r.id_recette in (" + info + ")", [], function (t, data) {
+                    t.executeSql("SELECT * FROM ing_ingredient i, recette_ingredient r WHERE r.id_ingredient = i.id AND r.id_recette in (" + info + ") order by i.ing_nom", [], function (t, data) {
                         for(var i = 0; i < data.rows.length; i++){ 
                             var row = data.rows.item(i);
                             //$("#listeIngredientsRecette").append('<li><a href="#">' + row.ing_nom + "</a></li>");
                             var idCbxIngredient = '"cbxIngredient' + row.id + '"';
-                            $("#cbFieldIng").append('<input type="checkbox" name=' + idCbxIngredient + 'id=' + idCbxIngredient + 'value=' + row.id + '><label for=' + idCbxIngredient + '>' + row.ing_nom + '</label>');
+                            $("#cbFieldIng").append('<input type="checkbox" name=' + idCbxIngredient + 'id=' + idCbxIngredient + 'value=' + row.id + '><label for=' + idCbxIngredient + '>' + row.ing_nom + ' ' + row.ri_quantite + '</label>');
 
                         }
                     }, onError);

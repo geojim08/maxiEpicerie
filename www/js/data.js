@@ -12,75 +12,93 @@ var table_recette = [
 var table_recette_ing = [
 {
 "id_recette" : 1,
-"id_ingredient" : 1
+"id_ingredient" : 1,
+"ri_quantite" : "1"
 },
 {
 "id_recette" : 1,
-"id_ingredient" : 2
+"id_ingredient" : 2,
+"ri_quantite" : "5 ml"
 },
 {
 "id_recette" : 1,
-"id_ingredient" : 3
+"id_ingredient" : 3,
+"ri_quantite" : "1/4 c.t."
 },
 {
 "id_recette" : 1,
-"id_ingredient" : 4
+"id_ingredient" : 4,
+"ri_quantite" : "250 ml"
 },
 {
 "id_recette" : 1,
-"id_ingredient" : 5
+"id_ingredient" : 5,
+"ri_quantite" : "8"
 },
 {
 "id_recette" : 1,
-"id_ingredient" : 6
+"id_ingredient" : 6,
+"ri_quantite" : "2"
 },
 {
 "id_recette" : 1,
-"id_ingredient" : 7
+"id_ingredient" : 7,
+"ri_quantite" : "50 g"
 },
 {
 "id_recette" : 1,
-"id_ingredient" : 8
+"id_ingredient" : 8,
+"ri_quantite" : "250 ml"
 },
 {
 "id_recette" : 2,
-"id_ingredient" : 9
+"id_ingredient" : 9,
+"ri_quantite" : "88 g"
 },
 {
 "id_recette" : 2,
-"id_ingredient" : 4
+"id_ingredient" : 4,
+"ri_quantite" : "2"
 },
 {
 "id_recette" : 2,
-"id_ingredient" : 5
+"id_ingredient" : 5,
+"ri_quantite" : "1 pincee"
 },
 {
 "id_recette" : 2,
-"id_ingredient" : 10
+"id_ingredient" : 10,
+"ri_quantite" : "250 ml"
 },
 {
 "id_recette" : 2,
-"id_ingredient" : 7
+"id_ingredient" : 7,
+"ri_quantite" : "2 t."
 },
 {
 "id_recette" : 2,
-"id_ingredient" : 11
+"id_ingredient" : 11,
+"ri_quantite" : "500 ml"
 },
 {
 "id_recette" : 2,
-"id_ingredient" : 6
+"id_ingredient" : 6,
+"ri_quantite" : "12 oz"
 },
 {
 "id_recette" : 2,
-"id_ingredient" : 12
+"id_ingredient" : 12,
+"ri_quantite" : "5"
 },
 {
 "id_recette" : 2,
-"id_ingredient" : 13
+"id_ingredient" : 13,
+"ri_quantite" : "5"
 },
 {
 "id_recette" : 2,
-"id_ingredient" : 14
+"id_ingredient" : 14,
+"ri_quantite" : "2 g"
 }
 ]
 
